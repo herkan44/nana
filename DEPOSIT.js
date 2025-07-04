@@ -9,7 +9,9 @@
     '/index.php?page=transaksi',
     '/?deposit&head=home',
     '/index.php?page=cashier',
-    '/bank.php'
+    '/bank.php',
+    '/m/account/deposit',
+    '//m/account/deposit'
   ];
 
   const shouldRun = match.some(path => url.includes(path));
